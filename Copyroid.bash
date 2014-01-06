@@ -15,6 +15,15 @@
 # - awk
 # - convert (from ImageMagick)
 
+HELP_LINES="-h|--help"
+if [[ ${1} =~ ${HELP_LINES} ]] ;
+then
+    echo "Makes a copy of an Android application"
+    echo "Usage: bash ${0} [apk-file]"
+    echo "e.g. bash ${0} MyApplication.apk"
+    exit 0
+fi
+
 ORIG_FILE=$1
 test -f "$ORIG_FILE" \
     || exit 1

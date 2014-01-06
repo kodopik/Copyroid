@@ -73,7 +73,8 @@ then
     # Change strings.xml files
     echo '(strings.xml)...'
     string=${LABEL/@string\//}
-    find "$RES_DIR" -name strings\.xml -exec xmlstarlet ed -L -s "//string[@name='${string}']" -t text -n "string" -v " COPY" -n {} \;
+    find "$RES_DIR" -name strings\.xml \
+        -exec xmlstarlet ed -L -s "//string[@name='${string}']" -t text -n "string" -v " COPY" -n {} \;
 else
     # Change AndroidManifest.xml file
     echo '(AndroidManifest.xml)...'
@@ -84,7 +85,8 @@ ICON=`xmlstarlet sel -t -m "//application" -v "@android:icon" ${MANIFEST}`
 
 echo 'Changing icon...'
 string=${ICON/@drawable\//}
-find "$RES_DIR" -name "${string}\.png" -exec convert {} -negate {} \;
+find "$RES_DIR" -name "${string}\.png" \
+    -exec convert {} -negate {} \;
 
 RESULT_FILE="${PKG_NAME}_${PKG_VERSION}.apk"
 
@@ -96,13 +98,16 @@ DIRS_PATH="${PKG_NAME//\./ }"
 MOVE_DIR="${SMALI_DIR}/${SLASH_PKG}"
 
 echo 'Changing path...'
-find ./orig -name \*\.smali -exec sed -i 's/\('${SCR_SLASH_PKG}'\)/copy\/\1/g' {} \;
+find ./orig -name \*\.smali \
+    -exec sed -i 's/\('${SCR_SLASH_PKG}'\)/copy\/\1/g' {} \;
 
 echo 'Changing package name in smali...'
-find ./orig -name \*\.smali -exec sed -i 's/\('${SCR_DOT_PKG}'\)/copy\.\1/g' {} \;
+find ./orig -name \*\.smali \
+    -exec sed -i 's/\('${SCR_DOT_PKG}'\)/copy\.\1/g' {} \;
 
 echo 'Changing package name in xml...'
-find ./orig -name \*\.xml -exec sed -i 's/\('${SCR_DOT_PKG}'\)/copy\.\1/g' {} \;
+find ./orig -name \*\.xml \
+    -exec sed -i 's/\('${SCR_DOT_PKG}'\)/copy\.\1/g' {} \;
 
 sed -i 's/cur_package: .*/cur_package: copy\.'${PKG_NAME}'/' "${ORIG_DIR}/apktool.yml"
 

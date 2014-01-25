@@ -56,6 +56,11 @@ then
     exit 2
 fi
 
+if [[ -z ${SUFFIX} ]]
+then
+    SUFFIX="COPY"
+fi
+
 
 
 # We have to add `-o' key while using 2-nd version of `apktool'

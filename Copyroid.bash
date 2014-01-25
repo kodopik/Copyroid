@@ -132,8 +132,8 @@ MOVE_DIR="${SMALI_DIR}/${SLASH_PKG}"
 if [[ ! -d ${MOVE_DIR} ]]
 then
     echo "Klutz developers!"
-    echo "Sorry, you have to make a copy of this application by hand, \'cos the clumsy developers have made the path different from ithe package name."
-    echo "Maybe, I\'ll fix it later..."
+    echo "Sorry, you have to make a copy of this application by hand, 'cos the clumsy developers have made the path different from ithe package name."
+    echo "Maybe, I'll fix it later..."
     exit 4
 fi
 
@@ -177,7 +177,7 @@ echo; echo '**** BUILDING ****'
 apktool b "$ORIG_DIR" $FOLDER_PARAM "$RESULT_FILE" \
     || exit 5
 
-echo; echo; echo "Your ${SUFFIX} file is \`${RESULT_FILE}\'"
+echo; echo; echo "Your ${SUFFIX} file is \`${RESULT_FILE}'"
 echo
 
 exit 0

@@ -183,6 +183,7 @@ apktool b "$ORIG_DIR" $FOLDER_PARAM "$RESULT_FILE" \
     || exit 5
 
 echo; echo; echo "Your ${SUFFIX} file is \`${RESULT_FILE}'"
+echo "Don't forget to zipalign and sign it."
 echo
 
 exit 0

@@ -137,7 +137,8 @@ MOVE_DIR="${SMALI_DIR}/${SLASH_PKG}"
 if [[ ! -d ${MOVE_DIR} ]]
 then
     echo "Klutz developers!"
-    echo "Sorry, you have to make a copy of this application by hand, 'cos the clumsy developers have made the path different from ithe package name."
+    echo "Sorry, you have to make a copy of this application by hand,"
+    echo "'cos the clumsy developers have made the path different from ithe package name."
     echo "Maybe, I'll fix it later..."
     exit 4
 fi

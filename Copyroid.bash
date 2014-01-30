@@ -184,6 +184,8 @@ echo; echo '**** BUILDING ****'
 apktool b "$ORIG_DIR" $FOLDER_PARAM "$RESULT_FILE" \
     || exit 5
 
+
+
 echo 'Zipalign...'
 
 if `zipalign 4 ${RESULT_FILE} .tmp.apk 2>/dev/null`
@@ -193,8 +195,12 @@ else
     echo; echo "ERROR: Please install \`android-sdk' and add it into \$PATH"
 fi
 
+
+
 echo; echo; echo "Your ${SUFFIX} file is \`${RESULT_FILE}'"
 echo "Don't forget to sign it."
 echo
+
+
 
 exit 0

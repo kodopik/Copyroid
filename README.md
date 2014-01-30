@@ -10,6 +10,7 @@ Makes a copy of an Android application: you will be able to install both .apk fi
  - `awk`
  - `convert` (from ImageMagick)
  - `zipalign` (from Android SDK)
+ - `jarsigner` (from JAVA)
 
 #### Copyright
 © Anton 'KodopiK' Konoplev, 2013-2014

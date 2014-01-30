@@ -9,12 +9,13 @@
 # (c) Anton 'KodopiK' Konoplev, 2013-2014
 # 
 # Dependencies:
-# - apktool
-# - xmlstarlet
-# - sed (GNU sed with '--in-place' key)
-# - awk
-# - convert (from ImageMagick)
-# - zipalign (from Android SDK)
+# `apktool'
+# `xmlstarlet'
+# `sed' (GNU sed with `--in-place' key)
+# `awk'
+# `convert' (from ImageMagick)
+# `zipalign' (from Android SDK)
+# `jarsigner' (fom JAVA)
 
 
 

@@ -1,7 +1,7 @@
 #!/bin/bash
 #
 # Copyroid
-# v.0.1.2
+# v.0.1.3
 #
 # Makes a copy of an Android application:
 #   you will be able to install both .apk files
@@ -188,17 +188,54 @@ apktool b "$ORIG_DIR" $FOLDER_PARAM "$RESULT_FILE" \
 
 echo 'Zipalign...'
 
+test -f .tmp.apk && rm .tmp.apk
+
 if `zipalign 4 ${RESULT_FILE} .tmp.apk 2>/dev/null`
 then
     mv .tmp.apk ${RESULT_FILE}
 else
     echo; echo "ERROR: Please install \`android-sdk' and add it into \$PATH"
+    INSTALL_SDK=1
+fi
+
+
+
+echo 'Signing...'
+
+if [[ ! -f SIGN.xml ]] 
+then
+    echo "There is no SIGN.xml file. See SIGN.sample.xml"
+else
+
+    SIGN_PARAMS=`xmlstarlet sel -t -m "//param[@name]" -o "-" -v "@name" -o " " -v "@value" -o " " SIGN.xml`
+    SIGN_KEY=`xmlstarlet sel -t -m "//key" -v "//key" SIGN.xml`
+
+    #if `jarsigner ${SIGN_PARAMS} -signedjar .tmp.apk ${RESULT_FILE} ${SIGN_KEY}`
+    jarsigner ${SIGN_PARAMS} -signedjar .tmp.apk ${RESULT_FILE} ${SIGN_KEY} && JARSIGNER_RES=1 || JARSIGNER_RES=0
+    if [[ ${JARSIGNER_RES} ]]
+    then
+        mv .tmp.apk ${RESULT_FILE}
+    else
+        echo; echo "ERROR: Wrong parameters. Or there is no \`jarsigner' utility. Please install JAVA"
+        INSTALL_JAVA=1
+    fi
 fi
 
 
 
 echo; echo; echo "Your ${SUFFIX} file is \`${RESULT_FILE}'"
-echo "Don't forget to sign it."
+
+if [[ ${INSTALL_JAVA} ]]
+then
+    echo "Don't forget to sign it manually."
+fi
+
+
+if [[ ${INSTALL_SDK} ]]
+then
+    echo "And you'd better zipalign it..."
+fi
+
 echo
 
 

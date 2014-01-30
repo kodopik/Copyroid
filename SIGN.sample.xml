@@ -1,0 +1,15 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!-- SIGN.xml samle.
+     Please change values and
+     rename SIGN.samle.xml to SIGN.xml
+     You also can add some new parameters
+     (use `jarsigner -help' for extra info).
+-->
+<signature>
+    <key>YourKeyName</key>
+    <parem name="sigalg">SHA1withRSA</param>
+    <param name="digestalg">SHA1</param>
+    <param name="keystore">/path/to/YourKeyStorage.keystore</param>
+    <param name="storepass">YourSroragePassword</param>
+    <param name="keypass">YourKeyPassword</param>
+</signature>

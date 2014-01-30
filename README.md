@@ -9,6 +9,7 @@ Makes a copy of an Android application: you will be able to install both .apk fi
  - `sed` (GNU sed with '--in-place' key)
  - `awk`
  - `convert` (from ImageMagick)
+ - `zipalign` (from Android SDK)
 
 #### Copyright
 © Anton 'KodopiK' Konoplev, 2013-2014

@@ -1,7 +1,7 @@
 #!/bin/bash
 #
 # Copyroid
-# v.0.1.1
+# v.0.1.2
 #
 # Makes a copy of an Android application:
 #   you will be able to install both .apk files
@@ -14,6 +14,7 @@
 # - sed (GNU sed with '--in-place' key)
 # - awk
 # - convert (from ImageMagick)
+# - zipalign (from Android SDK)
 
 
 
@@ -183,8 +184,17 @@ echo; echo '**** BUILDING ****'
 apktool b "$ORIG_DIR" $FOLDER_PARAM "$RESULT_FILE" \
     || exit 5
 
+echo 'Zipalign...'
+
+if `zipalign 4 ${RESULT_FILE} .tmp.apk 2>/dev/null`
+then
+    mv .tmp.apk ${RESULT_FILE}
+else
+    echo; echo "ERROR: Please install \`android-sdk' and add it into \$PATH"
+fi
+
 echo; echo; echo "Your ${SUFFIX} file is \`${RESULT_FILE}'"
-echo "Don't forget to zipalign and sign it."
+echo "Don't forget to sign it."
 echo
 
 exit 0

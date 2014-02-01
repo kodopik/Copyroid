@@ -140,7 +140,7 @@ if [[ ! -d ${MOVE_DIR} ]]
 then
     echo "Klutz developers!"
     echo "Sorry, you have to make a copy of this application by hand,"
-    echo "'cos the clumsy developers have made the path different from ithe package name."
+    echo "'cos clumsy developers have made the path different from the package name."
     echo "Maybe, I'll fix it later..."
     exit 4
 fi
@@ -230,7 +230,6 @@ if [[ ${INSTALL_JAVA} ]]
 then
     echo "Don't forget to sign it manually."
 fi
-
 
 if [[ ${INSTALL_SDK} ]]
 then

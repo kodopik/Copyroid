@@ -13,5 +13,5 @@
         <param name="keystore" value="/path/to/YourKeyStorage.keystore" />
         <param name="storepass" value="YourSroragePassword" />
         <param name="keypass" value="YourKeyPassword" />
-    <parameters>
+    </parameters>
 </signature>

@@ -104,7 +104,7 @@ then
     echo '(strings.xml)...'
     string=${LABEL/@string\//}
     find "$RES_DIR" -name strings\.xml \
-        -exec xmlstarlet ed -L -s "//string[@name='${string}']" -t text -n "string" -v " ${SUFFIX}" -n {} \;
+        -exec xmlstarlet ed -L -s "//string[@name='${string}']" -t text -n "string" -v " ${SUFFIX}" {} \;
 else
     # Change AndroidManifest.xml file
     echo '(AndroidManifest.xml)...'

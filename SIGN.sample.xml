@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="utf-8"?>
-<!-- SIGN.xml samle.
+<!-- SIGN.xml sample.
      Please change values and
-     rename SIGN.samle.xml to SIGN.xml
+     rename SIGN.sample.xml to SIGN.xml
      You also can add some new parameters
      (use `jarsigner -help' for extra info).
 -->

@@ -113,6 +113,13 @@ fi
 
 
 
+echo 'Changing side authorities...'
+xmlstarlet ed -L -u "//provider[@android:authorities]/@android:authorities" -x "concat('copy.',.)" ${MANIFEST}
+# rude hack :(
+sed -i 's/="copy\.copy\./="copy./g' ${MANIFEST}
+
+
+
 echo 'Changing icon...'
 
 ICON=`xmlstarlet sel -t -m "//application" -v "@android:icon" ${MANIFEST}`

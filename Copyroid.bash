@@ -17,36 +17,47 @@
 # `zipalign' (from Android SDK)
 # `jarsigner' (fom JAVA)
 
+set -e
 
-
+# Help message
 function printHelp() {
     echo "Copyroid makes a copy of an Android application."
     echo "Usage: bash ${0} file [ suffix ]"
     echo "e.g. bash ${0} MyApplication.apk COPY"
 }
 
+declare -r HELP_LINES="-h|--help"
 
-
-HELP_LINES="-h|--help"
 if [[ ${1} =~ ${HELP_LINES} ]] ;
 then
     printHelp
     exit 0
 fi
 
+# Original APK file
+declare -r ORIG_FILE="$1"; shift
 
+# Suffix (to be added at the end of application and package names)
+if [[ -z ${1} ]]
+then
+    declare -r SUFFIX="COPY"
+else
+    declare -r SUFFIX="$1"
+fi
+shift
 
-ORIG_FILE="$1"
-SUFFIX="$2"
-ORIG_DIR='./orig'
-MANIFEST="${ORIG_DIR}/AndroidManifest.xml"
-SMALI_DIR="${ORIG_DIR}/smali"
-RES_DIR="${ORIG_DIR}/res"
-COPY_DIR="${SMALI_DIR}/copy"
+# Files and directories
+declare -r ORIG_DIR='./orig'
+declare -r TMP_FILE='.tmp.apk'
+declare -r MANIFEST="${ORIG_DIR}/AndroidManifest.xml"
+declare -r SMALI_DIR="${ORIG_DIR}/smali"
+declare -r RES_DIR="${ORIG_DIR}/res"
+declare COPY_DIR="${SMALI_DIR}/copy"
 
 if [[ ! -f "$ORIG_FILE" ]]
 then
     echo "Wrong input file"
+    echo
     printHelp
     exit 1
 fi
@@ -54,25 +65,22 @@ fi
 if [[ ${SUFFIX} =~ [^a-zA-Z0-9] ]]
 then
     echo "Suffix must be [a-zA-Z0-9]"
+    echo
     printHelp
     exit 2
 fi
 
-if [[ -z ${SUFFIX} ]]
-then
-    SUFFIX="COPY"
-fi
 
 
 
 # We have to add `-o' key while using 2-nd version of `apktool'
-APKTOOL_V=`apktool --version | awk -F\. '{ print $1 }'`
+declare -r APKTOOL_V=$(apktool --version | awk -F\. '{ print $1 }')
 
-if [[ $APKTOOL_V -gt 1 ]]
+if [[ $APKTOOL_V > 1 ]]
 then
-    FOLDER_PARAM='-o'
+    declare -r FOLDER_PARAM='-o'
 else
-    FOLDER_PARAM=''
+    declare -r FOLDER_PARAM=''
 fi
 
 
@@ -92,17 +100,17 @@ echo; echo '**** CHANGING ****'
 
 echo -n 'Changing app_name '
 
-PKG_NAME=`xmlstarlet sel -t -m "//manifest" -v "@package" ${MANIFEST}`
-PKG_VERSION=`grep versionName "${ORIG_DIR}/apktool.yml" | awk -F\: '{ print $2 }'`
-PKG_VERSION=${PKG_VERSION//[^0-9a-zA-Z\.\-]/}
-LABEL=`xmlstarlet sel -t -m "//application" -v "@android:label" ${MANIFEST}`
-echo $LABEL | grep -q '@string\/' && changeManifest=1 || unset changeManifest
+declare -r PKG_NAME=$(xmlstarlet sel -t -m "//manifest" -v "@package" ${MANIFEST})
+declare -r PKG_VERSION_TMP=$(awk -F\: '/versionName/{ print $2 }' "${ORIG_DIR}/apktool.yml")
+declare PKG_VERSION=${PKG_VERSION_TMP//[^0-9a-zA-Z\.\-]/}
+declare -r LABEL=$(xmlstarlet sel -t -m "//application" -v "@android:label" ${MANIFEST})
+echo $LABEL | grep -q '@string\/' && declare -r -i changeManifest=1 || unset changeManifest
 
 if [[ $changeManifest ]]
 then
     # Change strings.xml files
     echo '(strings.xml)...'
-    string=${LABEL/@string\//}
+    declare -r string=${LABEL/@string\//}
     find "$RES_DIR" -name strings\.xml \
         -exec xmlstarlet ed -L -s "//string[@name='${string}']" -t text -n "string" -v " ${SUFFIX}" {} \;
 else
@@ -115,33 +123,33 @@ fi
 
 echo 'Changing side authorities...'
 xmlstarlet ed -L -u "//provider[@android:authorities]/@android:authorities" -x "concat('copy.',.)" ${MANIFEST}
-# rude hack :(
+# can't get why it doesn't run correctly without this rude hack :(
 sed -i 's/="copy\.copy\./="copy./g' ${MANIFEST}
 
 
 
 echo 'Changing icon...'
 
-ICON=`xmlstarlet sel -t -m "//application" -v "@android:icon" ${MANIFEST}`
+declare -r ICON=$(xmlstarlet sel -t -m "//application" -v "@android:icon" ${MANIFEST})
 
 # Icon file can be in any directory, not only res/drawable
-#string=${ICON/@drawable\//}
-string=${ICON/@*\//}
+#declare -r string=${ICON/@drawable\//}
+declare -r iconstring=${ICON/@*\//}
 
 # TODO: change icon effect from simple negate to something more beautiful
-find "$RES_DIR" -name "${string}\.png" \
+find "$RES_DIR" -name "${iconstring}\.png" \
     -exec convert {} -negate {} \;
 
 
 
 echo 'Changing path...'
 
-RESULT_FILE="${PKG_NAME}_${PKG_VERSION}.apk"
-SCR_DOT_PKG=${PKG_NAME//\./\\\.}
-SCR_SLASH_PKG=${SCR_DOT_PKG//\./\/}
-SLASH_PKG=${PKG_NAME//\./\/}
-DIRS_PATH="${PKG_NAME//\./ }"
-MOVE_DIR="${SMALI_DIR}/${SLASH_PKG}"
+declare -r RESULT_FILE="${PKG_NAME}_${PKG_VERSION}.apk"
+declare -r SCR_DOT_PKG=${PKG_NAME//\./\\\.}
+declare -r SCR_SLASH_PKG=${SCR_DOT_PKG//\./\/}
+declare -r SLASH_PKG=${PKG_NAME//\./\/}
+declare -r DIRS_PATH="${PKG_NAME//\./ }"
+declare -r MOVE_DIR="${SMALI_DIR}/${SLASH_PKG}"
 
 if [[ ! -d ${MOVE_DIR} ]]
 then
@@ -152,21 +160,21 @@ then
     exit 4
 fi
 
-find ./orig -name \*\.smali \
+find "${ORIG_DIR}" -name \*\.smali \
     -exec sed -i 's/\('${SCR_SLASH_PKG}'\)/copy\/\1/g' {} \;
 
 
 
 echo 'Changing package name in smali...'
 
-find ./orig -name \*\.smali \
+find "${ORIG_DIR}" -name \*\.smali \
     -exec sed -i 's/\('${SCR_DOT_PKG}'\)/copy\.\1/g' {} \;
 
 
 
 echo 'Changing package name in xml...'
 
-find ./orig -name \*\.xml \
+find "${ORIG_DIR}" -name \*\.xml \
     -exec sed -i 's/\('${SCR_DOT_PKG}'\)/copy\.\1/g' {} \;
 
 sed -i 's/cur_package: .*/cur_package: copy\.'${PKG_NAME}'/' "${ORIG_DIR}/apktool.yml"
@@ -175,12 +183,13 @@ sed -i 's/cur_package: .*/cur_package: copy\.'${PKG_NAME}'/' "${ORIG_DIR}/apktoo
 
 echo 'Moving directories...'
 
+# Create path recursively...
 for dir in $DIRS_PATH
 do
     mkdir "${COPY_DIR}"
     COPY_DIR="${COPY_DIR}/${dir}"
 done
-
+# ... and move directory
 mv "${MOVE_DIR}" "${COPY_DIR}"
 
 
@@ -196,14 +205,14 @@ apktool b "$ORIG_DIR" $FOLDER_PARAM "$RESULT_FILE" \
 
 echo 'Zipalign...'
 
-test -f .tmp.apk && rm .tmp.apk
+test -f "${TMP_FILE}" && rm "${TMP_FILE}"
 
-if `zipalign 4 ${RESULT_FILE} .tmp.apk 2>/dev/null`
+if $(zipalign 4 ${RESULT_FILE} "${TMP_FILE}" 2>/dev/null)
 then
-    mv .tmp.apk ${RESULT_FILE}
+    mv "${TMP_FILE}" ${RESULT_FILE}
 else
-    echo; echo "ERROR: Please install \`android-sdk' and add it into \$PATH"
-    INSTALL_SDK=1
+    echo; echo "ERROR: Please install \`android-sdk' and add it into \$PATH" >&2
+    declare -r -i INSTALL_SDK=1
 fi
 
 
@@ -215,17 +224,17 @@ then
     echo "There is no SIGN.xml file. See SIGN.sample.xml"
 else
 
-    SIGN_PARAMS=`xmlstarlet sel -t -m "//param[@name]" -o "-" -v "@name" -o " " -v "@value" -o " " SIGN.xml`
-    SIGN_KEY=`xmlstarlet sel -t -m "//key" -v "//key" SIGN.xml`
+    declare -r SIGN_PARAMS=$(xmlstarlet sel -t -m "//param[@name]" -o "-" -v "@name" -o " " -v "@value" -o " " SIGN.xml)
+    declare -r SIGN_KEY=$(xmlstarlet sel -t -m "//key" -v "//key" SIGN.xml)
 
-    #if `jarsigner ${SIGN_PARAMS} -signedjar .tmp.apk ${RESULT_FILE} ${SIGN_KEY}`
-    jarsigner ${SIGN_PARAMS} -signedjar .tmp.apk ${RESULT_FILE} ${SIGN_KEY} && JARSIGNER_RES=1 || JARSIGNER_RES=0
+    #if $(jarsigner ${SIGN_PARAMS} -signedjar "${TMP_FILE}" ${RESULT_FILE} ${SIGN_KEY})
+    jarsigner ${SIGN_PARAMS} -signedjar "${TMP_FILE}" ${RESULT_FILE} ${SIGN_KEY} && declare -r -i JARSIGNER_RES=1 || declare -r -i JARSIGNER_RES=0
     if [[ ${JARSIGNER_RES} ]]
     then
-        mv .tmp.apk ${RESULT_FILE}
+        mv "${TMP_FILE}" "${RESULT_FILE}"
     else
-        echo; echo "ERROR: Wrong parameters. Or there is no \`jarsigner' utility. Please install JAVA"
-        INSTALL_JAVA=1
+        echo; echo "ERROR: Wrong parameters. Or there is no \`jarsigner' utility. Please install JAVA" >&2
+        declare -r -i INSTALL_JAVA=1
     fi
 fi
 

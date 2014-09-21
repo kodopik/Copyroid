@@ -56,7 +56,7 @@ declare COPY_DIR="${SMALI_DIR}/copy"
 
 if [[ ! -f "$ORIG_FILE" ]]
 then
-    echo "Wrong input file"
+    echo "Wrong input file" >&2
     echo
     printHelp
     exit 1
@@ -64,7 +64,7 @@ fi
 
 if [[ ${SUFFIX} =~ [^a-zA-Z0-9] ]]
 then
-    echo "Suffix must be [a-zA-Z0-9]"
+    echo "Suffix must be [a-zA-Z0-9]" >&2
     echo
     printHelp
     exit 2
@@ -153,10 +153,10 @@ declare -r MOVE_DIR="${SMALI_DIR}/${SLASH_PKG}"
 
 if [[ ! -d ${MOVE_DIR} ]]
 then
-    echo "Klutz developers!"
-    echo "Sorry, you have to make a copy of this application by hand,"
-    echo "'cos clumsy developers have made the path different from the package name."
-    echo "Maybe, I'll fix it later..."
+    echo "Klutz developers!
+Sorry, you have to make a copy of this application by hand,
+'cos clumsy developers have made the path different from the package name.
+Maybe, I'll fix it later..." >&2
     exit 4
 fi
 
@@ -221,7 +221,7 @@ echo 'Signing...'
 
 if [[ ! -f SIGN.xml ]] 
 then
-    echo "There is no SIGN.xml file. See SIGN.sample.xml"
+    echo "There is no SIGN.xml file. See SIGN.sample.xml" >&2
 else
 
     declare -r SIGN_PARAMS=$(xmlstarlet sel -t -m "//param[@name]" -o "-" -v "@name" -o " " -v "@value" -o " " SIGN.xml)

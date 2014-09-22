@@ -44,7 +44,6 @@ then
 else
     declare -r SUFFIX="$1"
 fi
-shift
 
 # Files and directories
 declare -r ORIG_DIR='./orig'

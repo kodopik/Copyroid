@@ -1,7 +1,7 @@
 #!/bin/bash
 #
 # Copyroid
-# v.0.1.3
+# v.0.2.0
 #
 # Makes a copy of an Android application:
 #   you will be able to install both .apk files
@@ -37,7 +37,7 @@ fi
 # Original APK file
 declare -r ORIG_FILE="$1"; shift
 
-# Suffix (to be added at the end of application and package names)
+# Suffix (to be added at the end of application and the begin of package names)
 if [[ -z ${1} ]]
 then
     declare -r SUFFIX="COPY"
@@ -45,13 +45,15 @@ else
     declare -r SUFFIX="$1"
 fi
 
+declare -r suffix=$(echo ${SUFFIX} | tr [:upper:] [:lower:])
+
 # Files and directories
 declare -r ORIG_DIR='./orig'
 declare -r TMP_FILE='.tmp.apk'
 declare -r MANIFEST="${ORIG_DIR}/AndroidManifest.xml"
 declare -r SMALI_DIR="${ORIG_DIR}/smali"
 declare -r RES_DIR="${ORIG_DIR}/res"
-declare COPY_DIR="${SMALI_DIR}/copy"
+declare COPY_DIR="${SMALI_DIR}/${suffix}"
 
 if [[ ! -f "$ORIG_FILE" ]]
 then
@@ -121,9 +123,9 @@ fi
 
 
 echo 'Changing side authorities...'
-xmlstarlet ed -L -u "//provider[@android:authorities]/@android:authorities" -x "concat('copy.',.)" ${MANIFEST}
-# can't get why it doesn't run correctly without this rude hack :(
-sed -i 's/="copy\.copy\./="copy./g' ${MANIFEST}
+xmlstarlet ed -L -u "//provider[@android:authorities]/@android:authorities" -x "concat('${suffix}.',.)" ${MANIFEST}
+# can't get why it doesn't run correctly without this rude cheat :(
+sed -i 's/="'${suffix}'\.'${suffix}'\./="'${suffix}'./g' ${MANIFEST}
 
 
 
@@ -160,23 +162,23 @@ Maybe, I'll fix it later..." >&2
 fi
 
 find "${ORIG_DIR}" -name \*\.smali \
-    -exec sed -i 's/\('${SCR_SLASH_PKG}'\)/copy\/\1/g' {} \;
+    -exec sed -i 's/\('${SCR_SLASH_PKG}'\)/'${suffix}'\/\1/g' {} \;
 
 
 
 echo 'Changing package name in smali...'
 
 find "${ORIG_DIR}" -name \*\.smali \
-    -exec sed -i 's/\('${SCR_DOT_PKG}'\)/copy\.\1/g' {} \;
+    -exec sed -i 's/\('${SCR_DOT_PKG}'\)/'${suffix}'\.\1/g' {} \;
 
 
 
 echo 'Changing package name in xml...'
 
 find "${ORIG_DIR}" -name \*\.xml \
-    -exec sed -i 's/\('${SCR_DOT_PKG}'\)/copy\.\1/g' {} \;
+    -exec sed -i 's/\('${SCR_DOT_PKG}'\)/'${suffix}'\.\1/g' {} \;
 
-sed -i 's/cur_package: .*/cur_package: copy\.'${PKG_NAME}'/' "${ORIG_DIR}/apktool.yml"
+sed -i 's/cur_package: .*/cur_package: '${suffix}'\.'${PKG_NAME}'/' "${ORIG_DIR}/apktool.yml"
 
 
 
@@ -185,6 +187,11 @@ echo 'Moving directories...'
 # Create path recursively...
 for dir in $DIRS_PATH
 do
+    if [[ -d "${COPY_DIR}" ]]
+    then
+        echo "Directory \"${COPY_DIR}\" already exists. Choose another suffix (which is \"${SUFFIX}\" now)." >&2
+        exit 6
+    fi
     mkdir "${COPY_DIR}"
     COPY_DIR="${COPY_DIR}/${dir}"
 done

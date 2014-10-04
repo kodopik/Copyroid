@@ -45,7 +45,8 @@ else
     declare -r SUFFIX="$1"
 fi
 
-declare -r suffix=$(echo ${SUFFIX} | tr [:upper:] [:lower:])
+# lowercase
+declare -r suffix=${SUFFIX,,}
 
 # Files and directories
 declare -r ORIG_DIR='./orig'

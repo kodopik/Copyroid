@@ -176,9 +176,7 @@ find "${ORIG_DIR}" -name \*\.xml \
 
 echo 'Changing side authorities...'
 xmlstarlet ed -L -u "//provider[@android:authorities]/@android:authorities" -x "concat('${suffix}.',.)" ${MANIFEST}
-# can't get why it doesn't run correctly without this rude cheat :(
-#find "${ORIG_DIR}" -maxdepth 1 -name AndroidManifest\.xml \
-    #-exec \
+# Remove duplicated suffixes
 sed -i "s/=\"${suffix}\.${suffix}\./=\"${suffix}\./g" "${MANIFEST}"
 
 

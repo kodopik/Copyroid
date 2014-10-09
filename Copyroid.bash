@@ -123,13 +123,6 @@ fi
 
 
 
-echo 'Changing side authorities...'
-xmlstarlet ed -L -u "//provider[@android:authorities]/@android:authorities" -x "concat('${suffix}.',.)" ${MANIFEST}
-# can't get why it doesn't run correctly without this rude cheat :(
-sed -i 's/="'${suffix}'\.'${suffix}'\./="'${suffix}'./g' ${MANIFEST}
-
-
-
 echo 'Changing icon...'
 
 declare -r ICON=$(xmlstarlet sel -t -m "//application" -v "@android:icon" ${MANIFEST})
@@ -178,6 +171,17 @@ echo 'Changing package name in xml...'
 
 find "${ORIG_DIR}" -name \*\.xml \
     -exec sed -i 's/\('${SCR_DOT_PKG}'\)/'${suffix}'\.\1/g' {} \;
+
+
+
+echo 'Changing side authorities...'
+xmlstarlet ed -L -u "//provider[@android:authorities]/@android:authorities" -x "concat('${suffix}.',.)" ${MANIFEST}
+# can't get why it doesn't run correctly without this rude cheat :(
+#find "${ORIG_DIR}" -maxdepth 1 -name AndroidManifest\.xml \
+    #-exec \
+sed -i "s/=\"${suffix}\.${suffix}\./=\"${suffix}\./g" "${MANIFEST}"
+
+
 
 sed -i 's/cur_package: .*/cur_package: '${suffix}'\.'${PKG_NAME}'/' "${ORIG_DIR}/apktool.yml"
 

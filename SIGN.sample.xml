@@ -11,7 +11,7 @@
         <param name="sigalg" value="SHA1withRSA" />
         <param name="digestalg" value="SHA1" />
         <param name="keystore" value="/path/to/YourKeyStorage.keystore" />
-        <param name="storepass" value="YourSroragePassword" />
+        <param name="storepass" value="YourStoragePassword" />
         <param name="keypass" value="YourKeyPassword" />
     </parameters>
 </signature>

@@ -228,13 +228,16 @@ fi
 
 echo 'Signing...'
 
-if [[ ! -f SIGN.xml ]] 
+declare -r SIGNFILE='SIGN.xml'
+#declare -r SIGNFILE='SIGN.ALTER.xml'
+
+if [[ ! -f $SIGNFILE ]] 
 then
-    echo "There is no SIGN.xml file. See SIGN.sample.xml" >&2
+    echo "There is no $SIGNFILE file. See SIGN.sample.xml" >&2
 else
 
-    declare -r SIGN_PARAMS=$(xmlstarlet sel -t -m "//param[@name]" -o "-" -v "@name" -o " " -v "@value" -o " " SIGN.xml)
-    declare -r SIGN_KEY=$(xmlstarlet sel -t -m "//key" -v "//key" SIGN.xml)
+    declare -r SIGN_PARAMS=$(xmlstarlet sel -t -m "//param[@name]" -o "-" -v "@name" -o " " -v "@value" -o " " $SIGNFILE)
+    declare -r SIGN_KEY=$(xmlstarlet sel -t -m "//key" -v "//key" $SIGNFILE)
 
     #if $(jarsigner ${SIGN_PARAMS} -signedjar "${TMP_FILE}" ${RESULT_FILE} ${SIGN_KEY})
     jarsigner ${SIGN_PARAMS} -signedjar "${TMP_FILE}" ${RESULT_FILE} ${SIGN_KEY} && declare -r -i JARSIGNER_RES=1 || declare -r -i JARSIGNER_RES=0
